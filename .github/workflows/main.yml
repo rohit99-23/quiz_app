@@ -44,6 +44,6 @@ jobs:
     - name: Deploy docker container
       run: |
           docker pull errohit07/rohit:$VERSION
-          docker stop website || true
-          docker rm website || true
+          docker stop Quiz_website || true
+          docker rm Quiz_website || true
           docker run -d --name Quiz_website -p 9090:80 errohit07/rohit:$VERSION /usr/sbin/nginx -g "daemon off;"
