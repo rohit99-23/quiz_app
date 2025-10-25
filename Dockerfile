@@ -1,5 +1,5 @@
 # Step 1: Use your existing Docker image as base
-FROM rohit/my-website:1.0
+FROM errohit07/rohit
 
 # Step 2: Copy updated website files into container
 COPY . /usr/share/nginx/html

@@ -21,7 +21,7 @@ jobs:
     - name: Check if Docker image exists
       id: check_image
       run: |
-        if docker pull errohit07:$VERSION; then
+        if docker pull errohit07/rohit:$VERSION; then
           echo "IMAGE_EXISTS=true" >> $GITHUB_ENV
           echo "Image already exists, skipping build"
         else
@@ -37,7 +37,7 @@ jobs:
     - name: Build & Push Docker Image
       if: env.IMAGE_EXISTS == 'false'
       run: |
-       docker build -t errohit07:$VERSION .
+       docker build -t errohit07/rohit:$VERSION .
        docker push errohit07:$VERSION
 
 
@@ -48,7 +48,7 @@ jobs:
         username: ${{ secrets.VM_USER }}
         key: ${{ secrets.VM_SSH_KEY }}
         script: |
-          docker pull errohit07:$VERSION
+          docker pull errohit07/rohit:$VERSION
           docker stop website || true
           docker rm website || true
-          docker run -d --name Quiz_website -p 9090:80 errohit07e:$VERSION
+          docker run -d --name Quiz_website -p 9090:80 errohit07/rohit:$VERSION
