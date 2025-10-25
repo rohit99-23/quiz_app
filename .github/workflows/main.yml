@@ -38,7 +38,7 @@ jobs:
       if: env.IMAGE_EXISTS == 'false'
       run: |
        docker build -t errohit07/rohit:$VERSION .
-       docker push errohit07:$VERSION
+       docker push errohit07/rohit:$VERSION
 
 
     - name: Deploy to VM
