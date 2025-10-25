@@ -46,4 +46,4 @@ jobs:
           docker pull errohit07/rohit:$VERSION
           docker stop website || true
           docker rm website || true
-          docker run -d --name Quiz_website -p 9090:80 errohit07/rohit:$VERSION
+          docker run -d --name Quiz_website -p 9090:80 errohit07/rohit:$VERSION nginx -g "daemon off;"
