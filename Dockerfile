@@ -10,4 +10,5 @@ ENV PATH="/usr/sbin:${PATH}"
 EXPOSE 80
 
 # Step 4: Start Nginx in foreground
-CMD ["nginx", "-g", "daemon off;"]
+CMD ["/usr/sbin/nginx", "-g", "daemon off;"]
+
