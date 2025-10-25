@@ -1,0 +1,54 @@
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches: [ main ]
+
+jobs:
+  build-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+
+    - name: Set Version
+      id: vars
+      run: |
+        VERSION=$(git rev-parse --short HEAD)
+        echo "VERSION=$VERSION" >> $GITHUB_ENV
+
+    - name: Check if Docker image exists
+      id: check_image
+      run: |
+        if docker pull errohit07:$VERSION; then
+          echo "IMAGE_EXISTS=true" >> $GITHUB_ENV
+          echo "Image already exists, skipping build"
+        else
+          echo "IMAGE_EXISTS=false" >> $GITHUB_ENV
+        fi
+
+    - name: Login Docker Hub
+      uses: docker/login-action@v2
+      with:
+        username: ${{ secrets.DOCKER_USERNAME }}
+        password: ${{ secrets.DOCKER_PASSWORD }}
+
+    - name: Build & Push Docker Image
+      if: env.IMAGE_EXISTS == 'false'
+      run: |
+       docker build -t errohit07:$VERSION .
+       docker push errohit07:$VERSION
+
+
+    - name: Deploy to VM
+      uses: appleboy/ssh-action@v0.1.6
+      with:
+        host: ${{ secrets.VM_HOST }}
+        username: ${{ secrets.VM_USER }}
+        key: ${{ secrets.VM_SSH_KEY }}
+        script: |
+          docker pull errohit07:$VERSION
+          docker stop website || true
+          docker rm website || true
+          docker run -d --name Quiz_website -p 9090:80 errohit07e:$VERSION
