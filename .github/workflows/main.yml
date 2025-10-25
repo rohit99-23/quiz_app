@@ -41,13 +41,8 @@ jobs:
        docker push errohit07/rohit:$VERSION
 
 
-    - name: Deploy to VM
-      uses: appleboy/ssh-action@v0.1.6
-      with:
-        host: ${{ secrets.VM_HOST }}
-        username: ${{ secrets.VM_USER }}
-        key: ${{ secrets.VM_SSH_KEY }}
-        script: |
+    - name: Deploy docker container
+      run: |
           docker pull errohit07/rohit:$VERSION
           docker stop website || true
           docker rm website || true
