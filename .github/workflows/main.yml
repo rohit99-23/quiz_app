@@ -6,7 +6,7 @@ on:
 
 jobs:
   build-deploy:
-    runs-on: ubuntu-latest
+    runs-on: self-hosted
 
     steps:
     - name: Checkout code
@@ -18,27 +18,36 @@ jobs:
         VERSION=$(git rev-parse --short HEAD)
         echo "VERSION=$VERSION" >> $GITHUB_ENV
 
-    - name: Login to Docker Hub
+    - name: Check if Docker image exists
+      id: check_image
+      run: |
+        if docker pull errohit07/rohit:$VERSION; then
+          echo "IMAGE_EXISTS=true" >> $GITHUB_ENV
+          echo "Image already exists, skipping build"
+        else
+          echo "IMAGE_EXISTS=false" >> $GITHUB_ENV
+        fi
+
+    - name: Login Docker Hub
       uses: docker/login-action@v2
       with:
         username: ${{ secrets.DOCKER_USERNAME }}
         password: ${{ secrets.DOCKER_PASSWORD }}
 
     - name: Build & Push Docker Image
+      if: env.IMAGE_EXISTS == 'false'
       run: |
-        docker build -t errohit07/rohit:$VERSION .
-        docker push errohit07/rohit:$VERSION
+       docker build -t errohit07/rohit:$VERSION .
+       docker push errohit07/rohit:$VERSION
 
-    - name: Deploy to Remote VM
-      uses: appleboy/ssh-action@v0.1.10
-      with:
-        host: ${{ secrets.VM_HOST }}
-        username: ${{ secrets.VM_USER }}
-        key: ${{ secrets.VM_SSH_KEY }}
-        script: |
+
+    - name: Deploy docker container
+      run: |
           docker pull errohit07/rohit:$VERSION
           docker stop Quiz_website || true
           docker rm Quiz_website || true
+          
           docker run -d --name Quiz_website -p 9090:80 errohit07/rohit:$VERSION
+          sleep 5
           docker ps -a
           docker logs Quiz_website || true
