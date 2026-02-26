@@ -79,4 +79,4 @@ jobs:
       - name: Show Website URL
         run: |
           echo "🌐 Live website URL:"
-          echo "http://${{ secrets.S3_BUCKET }}.s3-website-${{ secrets.AWS_REGION }}.amazonaws.com"
+          echo "http://${{ secrets.S3_BUCKET }}.s3-website.${{ secrets.AWS_REGION }}.amazonaws.com"
